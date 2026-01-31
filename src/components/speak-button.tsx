@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Volume2, Square } from 'lucide-react';
+import { Volume2, Square, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { textToSpeechAction } from '@/app/actions';
@@ -15,24 +15,72 @@ interface SpeakButtonProps {
 
 export function SpeakButton({ textToSpeak, className, lang = 'ur-PK' }: SpeakButtonProps) {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [audioSrc, setAudioSrc] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
 
   const stopPlayback = () => {
     if (audioRef.current) {
       audioRef.current.pause();
-      audioRef.current = null; // Clean up the reference
+      audioRef.current.currentTime = 0;
+      audioRef.current = null;
     }
     setIsPlaying(false);
   };
-  
-  // Clean up on component unmount
+
   useEffect(() => {
     return () => {
       stopPlayback();
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (isPlaying) {
+      stopPlayback();
+    }
+    setAudioSrc(null);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [textToSpeak, lang]);
+
+  const playAudio = (src: string) => {
+    if (audioRef.current) {
+      stopPlayback();
+    }
+    
+    const audio = new Audio(src);
+    audioRef.current = audio;
+    setIsPlaying(true);
+
+    const onEnd = () => {
+      if (audioRef.current === audio) {
+        setIsPlaying(false);
+        audioRef.current = null;
+      }
+    };
+    
+    audio.addEventListener('ended', onEnd);
+    audio.addEventListener('error', (e) => {
+      console.error('Audio playback error:', e);
+      toast({
+        variant: 'destructive',
+        title: 'Audio Error',
+        description: 'Could not play audio. The format might be unsupported.',
+      });
+      onEnd();
+    });
+    
+    audio.play().catch(e => {
+        console.error('Audio play() failed:', e);
+        toast({
+            variant: 'destructive',
+            title: 'Playback Error',
+            description: 'Could not start audio playback.',
+        });
+        onEnd();
+    });
+  };
 
   const handleSpeak = async () => {
     if (isPlaying) {
@@ -43,53 +91,39 @@ export function SpeakButton({ textToSpeak, className, lang = 'ur-PK' }: SpeakBut
     if (!textToSpeak || !textToSpeak.trim()) {
       return;
     }
+    
+    if (audioSrc) {
+      playAudio(audioSrc);
+      return;
+    }
 
-    setIsPlaying(true);
+    setIsGenerating(true);
     try {
       const response = await textToSpeechAction(textToSpeak, lang);
 
       if (response.success && response.success.media) {
-        // Create a new Audio object for each playback request
-        const audio = new Audio(response.success.media);
-        audioRef.current = audio;
-
-        const onEnd = () => {
-          // Check if the audio that ended is the current one before stopping
-          if (audioRef.current === audio) {
-            stopPlayback();
-          }
-        };
-
-        audio.addEventListener('ended', onEnd);
-        audio.addEventListener('error', (e) => {
-          console.error('Audio playback error:', e);
-          toast({
-            variant: 'destructive',
-            title: 'Audio Error',
-            description: 'Could not play audio. The format might be unsupported.',
-          });
-          onEnd(); // Also stop on error
-        });
-        
-        await audio.play();
+        setAudioSrc(response.success.media);
+        playAudio(response.success.media);
       } else {
         toast({
           variant: 'destructive',
-          title: 'Audio Error',
+          title: 'Audio Generation Error',
           description: response.error || 'Failed to generate audio.',
         });
-        setIsPlaying(false);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Text-to-speech action error:', error);
-      toast({
+       toast({
         variant: 'destructive',
         title: 'Audio Error',
-        description: 'An unexpected error occurred while generating audio.',
+        description: error.message || 'An unexpected error occurred.',
       });
-      setIsPlaying(false);
+    } finally {
+      setIsGenerating(false);
     }
   };
+  
+  const isDisabled = isGenerating || (!textToSpeak || !textToSpeak.trim());
 
   return (
     <Button
@@ -97,10 +131,13 @@ export function SpeakButton({ textToSpeak, className, lang = 'ur-PK' }: SpeakBut
       variant="ghost"
       size="icon"
       onClick={handleSpeak}
+      disabled={isDisabled}
       className={cn(className)}
       aria-label={isPlaying ? 'Stop audio' : 'Play audio' }
     >
-      {isPlaying ? (
+      {isGenerating ? (
+        <Loader2 className="h-5 w-5 animate-spin" />
+      ) : isPlaying ? (
         <Square className="h-5 w-5" />
       ) : (
         <Volume2 className="h-5 w-5" />
