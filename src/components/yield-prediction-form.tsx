@@ -46,6 +46,7 @@ export function YieldPredictionForm() {
       historicalData: '{"year": 2022, "yield": "40 bushels/acre"}, {"year": 2021, "yield": "38 bushels/acre"}',
       currentConditions: '{"soil_moisture": "optimal", "temperature": "28°C", "recent_rain": "5mm"}',
       farmingPractices: '{"irrigation": "canal-based, twice a week", "fertilizer": "urea, DAP", "pest_control": "standard pesticides"}',
+      language: 'Urdu',
     },
   });
 
@@ -83,7 +84,14 @@ export function YieldPredictionForm() {
               />
               <FormItem>
                   <FormLabel>Voice Input Language</FormLabel>
-                  <Select onValueChange={setLanguage} defaultValue={language}>
+                  <Select
+                    onValueChange={(value) => {
+                        setLanguage(value);
+                        const langLabel = languageOptions.find(l => l.value === value)?.label || 'Urdu';
+                        form.setValue('language', langLabel);
+                    }}
+                    defaultValue={language}
+                  >
                       <FormControl>
                           <SelectTrigger>
                               <SelectValue placeholder="Select a language" />
@@ -190,7 +198,7 @@ export function YieldPredictionForm() {
                   <Sparkles className="h-6 w-6 text-primary" />
                   Prediction & Insights
                 </CardTitle>
-                <SpeakButton textToSpeak={`Predicted Yield: ${result.predictedYield}. Insights: ${result.insights}`} />
+                <SpeakButton textToSpeak={`${result.predictedYield}. ${result.insights}`} />
               </div>
             </CardHeader>
             <CardContent className="space-y-4">

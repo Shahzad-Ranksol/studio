@@ -19,6 +19,7 @@ const CropTimingSuggestionsInputSchema = z.object({
   weatherForecast: z
     .string()
     .describe('The weather forecast for the specified location.'),
+  language: z.string().describe('The language for the response (e.g., "Urdu", "Punjabi", "English").'),
 });
 
 export type CropTimingSuggestionsInput = z.infer<
@@ -51,7 +52,7 @@ const prompt = ai.definePrompt({
   name: 'cropTimingSuggestionsPrompt',
   input: {schema: CropTimingSuggestionsInputSchema},
   output: {schema: CropTimingSuggestionsOutputSchema},
-  prompt: `You are an expert agricultural advisor. Based on the farmer's location, crop type, and weather forecast, provide the optimal planting and harvesting times.
+  prompt: `You are an expert agricultural advisor. Based on the farmer's location, crop type, and weather forecast, provide the optimal planting and harvesting times. Respond in this language: {{{language}}}.
 
 Location: {{{location}}}
 Crop Type: {{{cropType}}}

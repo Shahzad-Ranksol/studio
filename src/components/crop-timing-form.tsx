@@ -45,6 +45,7 @@ export function CropTimingForm() {
       cropType: '',
       location: '',
       weatherForecast: 'Sunny with occasional clouds, temperatures between 25-35°C for the next 10 days.',
+      language: 'Urdu',
     },
   });
 
@@ -103,7 +104,14 @@ export function CropTimingForm() {
               />
               <FormItem>
                 <FormLabel>Voice Input Language</FormLabel>
-                <Select onValueChange={setLanguage} defaultValue={language}>
+                <Select
+                  onValueChange={(value) => {
+                    setLanguage(value);
+                    const langLabel = languageOptions.find(l => l.value === value)?.label || 'Urdu';
+                    form.setValue('language', langLabel);
+                  }}
+                  defaultValue={language}
+                >
                     <FormControl>
                         <SelectTrigger>
                             <SelectValue placeholder="Select a language" />
@@ -188,7 +196,7 @@ export function CropTimingForm() {
                   <Sparkles className="h-6 w-6 text-primary" />
                   AI-Powered Suggestions
                 </CardTitle>
-                <SpeakButton textToSpeak={`Planting time: ${result.plantingTime}. Harvesting time: ${result.harvestingTime}. Considerations: ${result.considerations}`} />
+                <SpeakButton textToSpeak={`${result.plantingTime}. ${result.harvestingTime}. ${result.considerations}`} />
               </div>
             </CardHeader>
             <CardContent className="space-y-4">

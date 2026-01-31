@@ -29,6 +29,7 @@ const YieldPredictionInputSchema = z.object({
     .describe(
       'Description of current farming practices (e.g., irrigation, fertilization), as a JSON string.'
     ),
+  language: z.string().describe('The language for the response (e.g., "Urdu", "Punjabi", "English").'),
 });
 export type YieldPredictionInput = z.infer<typeof YieldPredictionInputSchema>;
 
@@ -50,7 +51,7 @@ const prompt = ai.definePrompt({
   name: 'yieldPredictionPrompt',
   input: {schema: YieldPredictionInputSchema},
   output: {schema: YieldPredictionOutputSchema},
-  prompt: `You are an expert agricultural advisor.  Based on the provided information, predict the crop yield and provide actionable insights for improvement.
+  prompt: `You are an expert agricultural advisor.  Based on the provided information, predict the crop yield and provide actionable insights for improvement. Respond in this language: {{{language}}}.
 
 Crop Type: {{{cropType}}}
 Location: {{{location}}}
