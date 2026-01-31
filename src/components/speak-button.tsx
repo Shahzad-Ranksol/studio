@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Volume2, Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -14,32 +14,28 @@ interface SpeakButtonProps {
 }
 
 export function SpeakButton({ textToSpeak, className, lang = 'ur-PK' }: SpeakButtonProps) {
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
 
   const stopPlayback = () => {
     if (audioRef.current) {
       audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      // Clean up listeners to prevent memory leaks from old audio objects
-      audioRef.current.onended = null;
-      audioRef.current.onerror = null;
-      audioRef.current = null;
+      audioRef.current = null; // Clean up the reference
     }
-    setIsProcessing(false);
+    setIsPlaying(false);
   };
   
-  // Clean up on unmount
-  React.useEffect(() => {
+  // Clean up on component unmount
+  useEffect(() => {
     return () => {
       stopPlayback();
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSpeak = async () => {
-    // If we are currently playing/loading, stop.
-    if (isProcessing) {
+    if (isPlaying) {
       stopPlayback();
       return;
     }
@@ -48,44 +44,50 @@ export function SpeakButton({ textToSpeak, className, lang = 'ur-PK' }: SpeakBut
       return;
     }
 
-    setIsProcessing(true);
+    setIsPlaying(true);
     try {
       const response = await textToSpeechAction(textToSpeak, lang);
 
       if (response.success && response.success.media) {
+        // Create a new Audio object for each playback request
         const audio = new Audio(response.success.media);
         audioRef.current = audio;
 
-        audio.onended = () => {
-          stopPlayback();
+        const onEnd = () => {
+          // Check if the audio that ended is the current one before stopping
+          if (audioRef.current === audio) {
+            stopPlayback();
+          }
         };
-        audio.onerror = (e) => {
+
+        audio.addEventListener('ended', onEnd);
+        audio.addEventListener('error', (e) => {
           console.error('Audio playback error:', e);
-          stopPlayback();
           toast({
             variant: 'destructive',
             title: 'Audio Error',
             description: 'Could not play audio. The format might be unsupported.',
           });
-        };
+          onEnd(); // Also stop on error
+        });
         
         await audio.play();
       } else {
-        setIsProcessing(false);
         toast({
           variant: 'destructive',
           title: 'Audio Error',
           description: response.error || 'Failed to generate audio.',
         });
+        setIsPlaying(false);
       }
     } catch (error) {
-      setIsProcessing(false);
       console.error('Text-to-speech action error:', error);
       toast({
         variant: 'destructive',
         title: 'Audio Error',
         description: 'An unexpected error occurred while generating audio.',
       });
+      setIsPlaying(false);
     }
   };
 
@@ -96,9 +98,9 @@ export function SpeakButton({ textToSpeak, className, lang = 'ur-PK' }: SpeakBut
       size="icon"
       onClick={handleSpeak}
       className={cn(className)}
-      aria-label={isProcessing ? 'Stop audio' : 'Play audio' }
+      aria-label={isPlaying ? 'Stop audio' : 'Play audio' }
     >
-      {isProcessing ? (
+      {isPlaying ? (
         <Square className="h-5 w-5" />
       ) : (
         <Volume2 className="h-5 w-5" />

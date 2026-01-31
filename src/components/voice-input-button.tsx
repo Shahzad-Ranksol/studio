@@ -15,14 +15,22 @@ export function VoiceInputButton({ onTranscript, className, lang = 'ur-PK' }: Vo
   const [isListening, setIsListening] = useState(false);
   const [isAvailable, setIsAvailable] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) {
+      return;
+    }
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       setIsAvailable(true);
       const recognition = new SpeechRecognition();
       recognition.continuous = false;
-      recognition.lang = lang; // Urdu - Pakistan, can be changed
+      recognition.lang = lang;
       recognition.interimResults = false;
 
       recognition.onresult = (event) => {
@@ -41,7 +49,7 @@ export function VoiceInputButton({ onTranscript, className, lang = 'ur-PK' }: Vo
       
       recognitionRef.current = recognition;
     }
-  }, [onTranscript, lang]);
+  }, [onTranscript, lang, isMounted]);
 
   const handleToggleListening = () => {
     if (!recognitionRef.current) return;
@@ -54,6 +62,15 @@ export function VoiceInputButton({ onTranscript, className, lang = 'ur-PK' }: Vo
       setIsListening(true);
     }
   };
+
+  if (!isMounted) {
+     // Render a disabled placeholder on the server and initial client render to avoid hydration mismatch
+     return (
+        <Button type="button" variant="outline" size="icon" disabled className={className} title="Voice input initializing...">
+            <MicOff className="h-4 w-4" />
+        </Button>
+    );
+  }
 
   if (!isAvailable) {
     return (
