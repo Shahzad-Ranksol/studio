@@ -27,9 +27,9 @@ import { VoiceInputButton } from './voice-input-button';
 
 const languageOptions = [
     { value: 'ur-PK', label: 'Urdu' },
-    { value: 'pa-PK', label: 'Punjabi' },
-    { value: 'sd-PK', label: 'Sindhi' },
-    { value: 'ps-PK', label: 'Pashto' },
+    { value: 'pa-IN', label: 'Punjabi' },
+    { value: 'sd-IN', label: 'Sindhi' },
+    { value: 'ps-AF', label: 'Pashto' },
 ];
 
 const pakistanCrops = [

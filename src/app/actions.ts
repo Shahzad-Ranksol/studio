@@ -47,7 +47,7 @@ export async function getYieldPredictionAction(values: YieldPredictionFormValues
   }
 }
 
-export async function textToSpeechAction(text: string, lang?: string) {
+export async function textToSpeechAction(text: string, lang: string = 'ur-PK') {
   if (!text) {
     return {
       error: 'No text provided.',

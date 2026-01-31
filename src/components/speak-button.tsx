@@ -23,6 +23,9 @@ export function SpeakButton({ textToSpeak, className, lang = 'ur-PK' }: SpeakBut
     if (isLoading || isPlaying) {
       return;
     }
+    if (!textToSpeak || !textToSpeak.trim()) {
+        return;
+    }
 
     const playAudio = (url: string) => {
       const audio = new Audio(url);
