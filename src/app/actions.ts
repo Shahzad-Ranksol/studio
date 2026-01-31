@@ -19,10 +19,10 @@ export async function getCropTimingSuggestionsAction(values: CropTimingFormValue
   try {
     const result = await getCropTimingSuggestions(validatedFields.data);
     return { success: result };
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     return {
-      error: 'An error occurred while getting suggestions. Please try again.',
+      error: error.message || 'An error occurred while getting suggestions. Please try again.',
     };
   }
 }
@@ -39,10 +39,10 @@ export async function getYieldPredictionAction(values: YieldPredictionFormValues
   try {
     const result = await predictYieldAndProvideInsights(validatedFields.data);
     return { success: result };
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     return {
-      error: 'An error occurred while predicting yield. Please try again.',
+      error: error.message || 'An error occurred while predicting yield. Please try again.',
     };
   }
 }
@@ -56,10 +56,10 @@ export async function textToSpeechAction(text: string, lang: string = 'ur-PK') {
   try {
     const result = await textToSpeech(text, lang);
     return { success: result };
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     return {
-      error: 'An error occurred during text-to-speech conversion.',
+      error: error.message || 'An error occurred during text-to-speech conversion.',
     };
   }
 }
@@ -76,10 +76,10 @@ export async function getWeatherBasedAdviceAction(values: WeatherAdviceFormValue
   try {
     const result = await getWeatherBasedAdvice(validatedFields.data);
     return { success: result };
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     return {
-      error: 'An error occurred while getting weather advice. Please try again.',
+      error: error.message || 'An error occurred while getting weather advice. Please try again.',
     };
   }
 }

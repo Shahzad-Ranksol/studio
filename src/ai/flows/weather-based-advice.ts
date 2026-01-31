@@ -51,21 +51,21 @@ const prompt = ai.definePrompt({
     location: z.string(),
   })},
   output: {schema: WeatherBasedAdviceOutputSchema},
-  prompt: `You are an expert agricultural advisor for farmers in Pakistan. Your task is to provide clear, actionable advice based on the provided weather forecast for a specific location. The advice should be easy to understand and focused on practical farming activities.
+  prompt: `You are an expert agricultural advisor for farmers in Pakistan.
+Your response MUST be in this language: {{{language}}}.
 
-The response must be in the specified language: {{{language}}}.
-
-Location: {{{location}}}
-Weather Forecast Data (JSON):
+Analyze the following weather forecast for {{{location}}}:
 {{{forecast}}}
 
-Based on this forecast, provide:
-- **forecastSummary**: A brief, easy-to-understand summary of the next 7 days. Mention key events like rain, high winds, or extreme heat.
-- **advice**: Provide specific, actionable recommendations for the week. Your advice should cover topics like irrigation, spraying (pesticides/fungicides), harvesting, and general crop care.
+Based on the forecast, provide a summary and actionable advice.
 
-Keep the language simple and direct. The farmer relies on your guidance.
+You MUST format your response as a single, valid JSON object, like this example:
+{
+  "forecastSummary": "Summary of the weather in {{{language}}}",
+  "advice": "Farming advice in {{{language}}}"
+}
 
-Output your response as a JSON object with the keys "forecastSummary" and "advice".
+Do not add any text or formatting before or after the JSON object.
 `,
 });
 
@@ -85,6 +85,9 @@ const weatherBasedAdviceFlow = ai.defineFlow(
         language: language,
         forecast: forecastString,
     });
-    return output!;
+    if (!output) {
+      throw new Error('The AI model failed to generate advice. Please try again.');
+    }
+    return output;
   }
 );
