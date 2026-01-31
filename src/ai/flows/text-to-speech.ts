@@ -27,9 +27,6 @@ const textToSpeechFlow = ai.defineFlow(
         responseModalities: ['AUDIO'],
         speechConfig: {
           languageCode: lang,
-          voiceConfig: {
-            prebuiltVoiceConfig: { voiceName: 'Algenib' },
-          },
         },
       },
       prompt: text,
