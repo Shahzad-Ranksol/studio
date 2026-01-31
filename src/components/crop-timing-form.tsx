@@ -23,13 +23,21 @@ import { getCropTimingSuggestionsAction } from '@/app/actions';
 import { VoiceInputButton } from './voice-input-button';
 import { SpeakButton } from './speak-button';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 const cropOptions = ['Wheat', 'Rice', 'Cotton', 'Sugarcane', 'Maize'];
+const languageOptions = [
+    { value: 'ur-PK', label: 'Urdu' },
+    { value: 'pa-PK', label: 'Punjabi' },
+    { value: 'sd-PK', label: 'Sindhi' },
+    { value: 'ps-PK', label: 'Pashto' },
+];
 
 export function CropTimingForm() {
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<CropTimingSuggestionsOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [language, setLanguage] = useState('ur-PK');
 
   const form = useForm<CropTimingFormValues>({
     resolver: zodResolver(cropTimingSchema),
@@ -74,24 +82,43 @@ export function CropTimingForm() {
       <CardContent className="pt-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="cropType"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Crop Type</FormLabel>
-                   <div className="relative">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="cropType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Crop Type</FormLabel>
+                    <div className="relative">
+                      <FormControl>
+                          <Input list="crop-options" {...field} placeholder="e.g., Wheat" />
+                      </FormControl>
+                      <datalist id="crop-options">
+                          {cropOptions.map((crop) => <option key={crop} value={crop} />)}
+                      </datalist>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormItem>
+                <FormLabel>Voice Input Language</FormLabel>
+                <Select onValueChange={setLanguage} defaultValue={language}>
                     <FormControl>
-                        <Input list="crop-options" {...field} placeholder="e.g., Wheat" />
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select a language" />
+                        </SelectTrigger>
                     </FormControl>
-                    <datalist id="crop-options">
-                        {cropOptions.map((crop) => <option key={crop} value={crop} />)}
-                    </datalist>
-                   </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    <SelectContent>
+                        {languageOptions.map((lang) => (
+                            <SelectItem key={lang.value} value={lang.value}>
+                            {lang.label}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+              </FormItem>
+            </div>
             <FormField
               control={form.control}
               name="location"
@@ -120,7 +147,7 @@ export function CropTimingForm() {
                     <FormControl>
                       <Textarea {...field} placeholder="Describe the upcoming weather..." />
                     </FormControl>
-                    <VoiceInputButton onTranscript={(t) => form.setValue('weatherForecast', t, { shouldValidate: true })} />
+                    <VoiceInputButton lang={language} onTranscript={(t) => form.setValue('weatherForecast', t, { shouldValidate: true })} />
                   </div>
                   <FormMessage />
                 </FormItem>

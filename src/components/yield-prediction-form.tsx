@@ -22,11 +22,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getYieldPredictionAction } from '@/app/actions';
 import { SpeakButton } from './speak-button';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { VoiceInputButton } from './voice-input-button';
+
+const languageOptions = [
+    { value: 'ur-PK', label: 'Urdu' },
+    { value: 'pa-PK', label: 'Punjabi' },
+    { value: 'sd-PK', label: 'Sindhi' },
+    { value: 'ps-PK', label: 'Pashto' },
+];
 
 export function YieldPredictionForm() {
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<YieldPredictionOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [language, setLanguage] = useState('ur-PK');
 
   const form = useForm<YieldPredictionFormValues>({
     resolver: zodResolver(yieldPredictionSchema),
@@ -57,19 +67,38 @@ export function YieldPredictionForm() {
       <CardContent className="pt-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="cropType"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Crop Type</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="e.g., Wheat" />
-                  </FormControl>
-                  <FormMessage />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="cropType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Crop Type</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="e.g., Wheat" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormItem>
+                  <FormLabel>Voice Input Language</FormLabel>
+                  <Select onValueChange={setLanguage} defaultValue={language}>
+                      <FormControl>
+                          <SelectTrigger>
+                              <SelectValue placeholder="Select a language" />
+                          </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                          {languageOptions.map((lang) => (
+                              <SelectItem key={lang.value} value={lang.value}>
+                              {lang.label}
+                              </SelectItem>
+                          ))}
+                      </SelectContent>
+                  </Select>
                 </FormItem>
-              )}
-            />
+            </div>
             <FormField
               control={form.control}
               name="location"
@@ -89,9 +118,12 @@ export function YieldPredictionForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Historical Data (JSON format)</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} rows={3} />
-                  </FormControl>
+                  <div className="flex items-center gap-2">
+                    <FormControl>
+                      <Textarea {...field} rows={3} />
+                    </FormControl>
+                    <VoiceInputButton lang={language} onTranscript={(t) => form.setValue('historicalData', t, { shouldValidate: true })} />
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -102,9 +134,12 @@ export function YieldPredictionForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Current Conditions (JSON format)</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} rows={3} />
-                  </FormControl>
+                   <div className="flex items-center gap-2">
+                    <FormControl>
+                      <Textarea {...field} rows={3} />
+                    </FormControl>
+                     <VoiceInputButton lang={language} onTranscript={(t) => form.setValue('currentConditions', t, { shouldValidate: true })} />
+                   </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -115,9 +150,12 @@ export function YieldPredictionForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Farming Practices (JSON format)</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} rows={3} />
-                  </FormControl>
+                  <div className="flex items-center gap-2">
+                    <FormControl>
+                      <Textarea {...field} rows={3} />
+                    </FormControl>
+                    <VoiceInputButton lang={language} onTranscript={(t) => form.setValue('farmingPractices', t, { shouldValidate: true })} />
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}

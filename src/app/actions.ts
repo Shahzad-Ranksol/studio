@@ -2,6 +2,7 @@
 
 import { getCropTimingSuggestions } from '@/ai/flows/crop-timing-suggestions';
 import { predictYieldAndProvideInsights } from '@/ai/flows/yield-prediction-and-insights';
+import { textToSpeech } from '@/ai/flows/text-to-speech';
 import { cropTimingSchema, yieldPredictionSchema } from '@/lib/schemas';
 import type { CropTimingFormValues, YieldPredictionFormValues } from '@/lib/schemas';
 
@@ -41,6 +42,23 @@ export async function getYieldPredictionAction(values: YieldPredictionFormValues
     console.error(error);
     return {
       error: 'An error occurred while predicting yield. Please try again.',
+    };
+  }
+}
+
+export async function textToSpeechAction(text: string) {
+  if (!text) {
+    return {
+      error: 'No text provided.',
+    };
+  }
+  try {
+    const result = await textToSpeech(text);
+    return { success: result };
+  } catch (error) {
+    console.error(error);
+    return {
+      error: 'An error occurred during text-to-speech conversion.',
     };
   }
 }

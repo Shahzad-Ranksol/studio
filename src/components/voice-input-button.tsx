@@ -8,9 +8,10 @@ import { cn } from '@/lib/utils';
 interface VoiceInputButtonProps {
   onTranscript: (transcript: string) => void;
   className?: string;
+  lang?: string;
 }
 
-export function VoiceInputButton({ onTranscript, className }: VoiceInputButtonProps) {
+export function VoiceInputButton({ onTranscript, className, lang = 'ur-PK' }: VoiceInputButtonProps) {
   const [isListening, setIsListening] = useState(false);
   const [isAvailable, setIsAvailable] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
@@ -21,7 +22,7 @@ export function VoiceInputButton({ onTranscript, className }: VoiceInputButtonPr
       setIsAvailable(true);
       const recognition = new SpeechRecognition();
       recognition.continuous = false;
-      recognition.lang = 'ur-PK'; // Urdu - Pakistan, can be changed
+      recognition.lang = lang; // Urdu - Pakistan, can be changed
       recognition.interimResults = false;
 
       recognition.onresult = (event) => {
@@ -40,7 +41,7 @@ export function VoiceInputButton({ onTranscript, className }: VoiceInputButtonPr
       
       recognitionRef.current = recognition;
     }
-  }, [onTranscript]);
+  }, [onTranscript, lang]);
 
   const handleToggleListening = () => {
     if (!recognitionRef.current) return;

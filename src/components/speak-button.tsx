@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Volume2, Loader2, VolumeX } from 'lucide-react';
+import { useState, useTransition } from 'react';
+import { Volume2, Loader2, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { textToSpeechAction } from '@/app/actions';
+import { useToast } from '@/hooks/use-toast';
 
 interface SpeakButtonProps {
   textToSpeak: string;
@@ -11,40 +13,32 @@ interface SpeakButtonProps {
 }
 
 export function SpeakButton({ textToSpeak, className }: SpeakButtonProps) {
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [isAvailable, setIsAvailable] = useState(false);
-
-  useEffect(() => {
-    if ('speechSynthesis' in window) {
-      setIsAvailable(true);
-    }
-    // Cleanup function to cancel speech when component unmounts
-    return () => {
-      if (window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-      }
-    };
-  }, []);
+  const [isPending, startTransition] = useTransition();
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const handleSpeak = () => {
-    if (!isAvailable || isSpeaking) {
-      window.speechSynthesis.cancel();
-      setIsSpeaking(false);
+    if (audioUrl) {
+      const audio = new Audio(audioUrl);
+      audio.play();
       return;
     }
 
-    const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    utterance.lang = 'en-US'; // Or dynamically set
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-
-    window.speechSynthesis.speak(utterance);
+    startTransition(async () => {
+      const response = await textToSpeechAction(textToSpeak);
+      if (response.success && response.success.media) {
+        setAudioUrl(response.success.media);
+        const audio = new Audio(response.success.media);
+        audio.play();
+      } else {
+        toast({
+            variant: "destructive",
+            title: "Audio Error",
+            description: response.error || 'Failed to generate audio.',
+        })
+      }
+    });
   };
-
-  if (!isAvailable) {
-    return null;
-  }
 
   return (
     <Button
@@ -53,9 +47,16 @@ export function SpeakButton({ textToSpeak, className }: SpeakButtonProps) {
       size="icon"
       onClick={handleSpeak}
       className={cn(className)}
-      aria-label={isSpeaking ? 'Stop speaking' : 'Read results aloud'}
+      disabled={isPending}
+      aria-label={audioUrl ? 'Play audio' : 'Generate and play audio'}
     >
-      {isSpeaking ? <VolumeX className="h-5 w-5 animate-pulse" /> : <Volume2 className="h-5 w-5" />}
+      {isPending ? (
+          <Loader2 className="h-5 w-5 animate-spin" />
+      ) : audioUrl ? (
+          <Play className="h-5 w-5" />
+      ) : (
+          <Volume2 className="h-5 w-5" />
+      )}
     </Button>
   );
 }
