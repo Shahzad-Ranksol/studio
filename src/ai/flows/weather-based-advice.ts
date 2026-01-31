@@ -59,15 +59,13 @@ Location: {{{location}}}
 Weather Forecast Data (JSON):
 {{{forecast}}}
 
-Based on this forecast, provide the following:
-1.  **Forecast Summary**: A brief, easy-to-understand summary of the next 7 days. Mention key events like rain, high winds, or extreme heat.
-2.  **Actionable Advice**: Provide specific recommendations for the week. Your advice should cover topics like:
-    *   **Irrigation**: When should the farmer irrigate their fields? Should they increase or decrease watering based on rain?
-    *   **Spraying (Pesticides/Fungicides)**: Are the conditions favorable for spraying? Advise on the best days to spray (e.g., low wind, no rain expected) and when to avoid it.
-    *   **Harvesting**: If crops are near harvesting, how does the weather affect the timing?
-    *   **General Crop Care**: Any other important activities or precautions based on the weather (e.g., protecting from heat stress, managing post-rain conditions).
+Based on this forecast, provide:
+- **forecastSummary**: A brief, easy-to-understand summary of the next 7 days. Mention key events like rain, high winds, or extreme heat.
+- **advice**: Provide specific, actionable recommendations for the week. Your advice should cover topics like irrigation, spraying (pesticides/fungicides), harvesting, and general crop care.
 
 Keep the language simple and direct. The farmer relies on your guidance.
+
+Output your response as a JSON object with the keys "forecastSummary" and "advice".
 `,
 });
 
