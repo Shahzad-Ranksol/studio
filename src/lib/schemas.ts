@@ -16,5 +16,11 @@ export const yieldPredictionSchema = z.object({
   language: z.string(),
 });
 
+export const weatherAdviceSchema = z.object({
+  location: z.string().min(3, 'Location is required.'),
+  language: z.string(),
+});
+
 export type CropTimingFormValues = z.infer<typeof cropTimingSchema>;
 export type YieldPredictionFormValues = z.infer<typeof yieldPredictionSchema>;
+export type WeatherAdviceFormValues = z.infer<typeof weatherAdviceSchema>;
