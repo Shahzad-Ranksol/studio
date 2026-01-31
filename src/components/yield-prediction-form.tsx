@@ -32,6 +32,30 @@ const languageOptions = [
     { value: 'ps-PK', label: 'Pashto' },
 ];
 
+const pakistanCrops = [
+  // Field Crops
+  'Wheat', 'Rice', 'Cotton', 'Sugarcane', 'Maize', 'Barley', 'Sorghum', 'Millet', 'Sunflower', 'Canola', 'Gram', 'Lentil (Masoor)', 'Mung Bean', 'Mash Bean',
+  // Fruits
+  'Mango', 'Orange', 'Kinnow', 'Apple', 'Banana', 'Guava', 'Dates', 'Grapes', 'Pomegranate', 'Apricot', 'Peach', 'Plum', 'Cherry', 'Fig', 'Lychee', 'Melon', 'Watermelon',
+  // Vegetables
+  'Potato', 'Onion', 'Tomato', 'Carrot', 'Spinach', 'Cauliflower', 'Cabbage', 'Cucumber', 'Peas', 'Okra (Ladyfinger)', 'Eggplant (Brinjal)', 'Bitter Gourd', 'Bottle Gourd', 'Radish', 'Turnip', 'Garlic', 'Ginger', 'Chilli', 'Coriander'
+];
+
+const pakistanLocations = [
+  // Punjab
+  'Lahore', 'Faisalabad', 'Rawalpindi', 'Multan', 'Gujranwala', 'Sialkot', 'Bahawalpur', 'Sargodha', 'Rahim Yar Khan', 'Jhang', 'Sheikhupura', 'Kasur', 'Okara', 'Sahiwal', 'Dera Ghazi Khan',
+  // Sindh
+  'Karachi', 'Hyderabad', 'Sukkur', 'Larkana', 'Nawabshah (Shaheed Benazirabad)', 'Mirpur Khas', 'Jacobabad', 'Shikarpur', 'Tando Allahyar', 'Thatta',
+  // Khyber Pakhtunkhwa
+  'Peshawar', 'Abbottabad', 'Mardan', 'Swat', 'Dera Ismail Khan', 'Kohat', 'Bannu', 'Charsadda', 'Nowshera', 'Mansehra', 'Haripur',
+  // Balochistan
+  'Quetta', 'Gwadar', 'Turbat', 'Khuzdar', 'Sibi', 'Chaman', 'Lasbela', 'Zhob',
+  // Gilgit-Baltistan
+  'Gilgit', 'Skardu', 'Chilas', 'Hunza', 'Gahkuch',
+  // Azad Kashmir
+  'Muzaffarabad', 'Mirpur', 'Kotli', 'Rawalakot', 'Bhimber'
+];
+
 export function YieldPredictionForm() {
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<YieldPredictionOutput | null>(null);
@@ -42,7 +66,7 @@ export function YieldPredictionForm() {
     resolver: zodResolver(yieldPredictionSchema),
     defaultValues: {
       cropType: 'Wheat',
-      location: 'Faisalabad, Punjab',
+      location: 'Faisalabad',
       historicalData: '{"year": 2022, "yield": "40 bushels/acre"}, {"year": 2021, "yield": "38 bushels/acre"}',
       currentConditions: '{"soil_moisture": "optimal", "temperature": "28°C", "recent_rain": "5mm"}',
       farmingPractices: '{"irrigation": "canal-based, twice a week", "fertilizer": "urea, DAP", "pest_control": "standard pesticides"}',
@@ -75,9 +99,20 @@ export function YieldPredictionForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Crop Type</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="e.g., Wheat" />
-                    </FormControl>
+                     <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select a crop" />
+                        </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                        {pakistanCrops.map((crop) => (
+                            <SelectItem key={crop} value={crop}>
+                            {crop}
+                            </SelectItem>
+                        ))}
+                        </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -113,9 +148,20 @@ export function YieldPredictionForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Location</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="e.g., Faisalabad, Punjab" />
-                  </FormControl>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select a location" />
+                            </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                            {pakistanLocations.map((location) => (
+                                <SelectItem key={location} value={location}>
+                                    {location}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                   <FormMessage />
                 </FormItem>
               )}

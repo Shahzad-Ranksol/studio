@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Calendar, ChevronsUpDown, Loader2, MapPin, Sparkles, AlertCircle } from 'lucide-react';
+import { Calendar, Loader2, MapPin, Sparkles, AlertCircle } from 'lucide-react';
 import type { CropTimingSuggestionsOutput } from '@/ai/flows/crop-timing-suggestions';
 
 import { cropTimingSchema, type CropTimingFormValues } from '@/lib/schemas';
@@ -25,13 +25,37 @@ import { SpeakButton } from './speak-button';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
-const cropOptions = ['Wheat', 'Rice', 'Cotton', 'Sugarcane', 'Maize'];
 const languageOptions = [
     { value: 'ur-PK', label: 'Urdu' },
     { value: 'pa-PK', label: 'Punjabi' },
     { value: 'sd-PK', label: 'Sindhi' },
     { value: 'ps-PK', label: 'Pashto' },
 ];
+
+const pakistanCrops = [
+  // Field Crops
+  'Wheat', 'Rice', 'Cotton', 'Sugarcane', 'Maize', 'Barley', 'Sorghum', 'Millet', 'Sunflower', 'Canola', 'Gram', 'Lentil (Masoor)', 'Mung Bean', 'Mash Bean',
+  // Fruits
+  'Mango', 'Orange', 'Kinnow', 'Apple', 'Banana', 'Guava', 'Dates', 'Grapes', 'Pomegranate', 'Apricot', 'Peach', 'Plum', 'Cherry', 'Fig', 'Lychee', 'Melon', 'Watermelon',
+  // Vegetables
+  'Potato', 'Onion', 'Tomato', 'Carrot', 'Spinach', 'Cauliflower', 'Cabbage', 'Cucumber', 'Peas', 'Okra (Ladyfinger)', 'Eggplant (Brinjal)', 'Bitter Gourd', 'Bottle Gourd', 'Radish', 'Turnip', 'Garlic', 'Ginger', 'Chilli', 'Coriander'
+];
+
+const pakistanLocations = [
+  // Punjab
+  'Lahore', 'Faisalabad', 'Rawalpindi', 'Multan', 'Gujranwala', 'Sialkot', 'Bahawalpur', 'Sargodha', 'Rahim Yar Khan', 'Jhang', 'Sheikhupura', 'Kasur', 'Okara', 'Sahiwal', 'Dera Ghazi Khan',
+  // Sindh
+  'Karachi', 'Hyderabad', 'Sukkur', 'Larkana', 'Nawabshah (Shaheed Benazirabad)', 'Mirpur Khas', 'Jacobabad', 'Shikarpur', 'Tando Allahyar', 'Thatta',
+  // Khyber Pakhtunkhwa
+  'Peshawar', 'Abbottabad', 'Mardan', 'Swat', 'Dera Ismail Khan', 'Kohat', 'Bannu', 'Charsadda', 'Nowshera', 'Mansehra', 'Haripur',
+  // Balochistan
+  'Quetta', 'Gwadar', 'Turbat', 'Khuzdar', 'Sibi', 'Chaman', 'Lasbela', 'Zhob',
+  // Gilgit-Baltistan
+  'Gilgit', 'Skardu', 'Chilas', 'Hunza', 'Gahkuch',
+  // Azad Kashmir
+  'Muzaffarabad', 'Mirpur', 'Kotli', 'Rawalakot', 'Bhimber'
+];
+
 
 export function CropTimingForm() {
   const [isPending, startTransition] = useTransition();
@@ -90,14 +114,20 @@ export function CropTimingForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Crop Type</FormLabel>
-                    <div className="relative">
-                      <FormControl>
-                          <Input list="crop-options" {...field} placeholder="e.g., Wheat" />
-                      </FormControl>
-                      <datalist id="crop-options">
-                          {cropOptions.map((crop) => <option key={crop} value={crop} />)}
-                      </datalist>
-                    </div>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select a crop" />
+                        </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                        {pakistanCrops.map((crop) => (
+                            <SelectItem key={crop} value={crop}>
+                            {crop}
+                            </SelectItem>
+                        ))}
+                        </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -135,8 +165,11 @@ export function CropTimingForm() {
                   <FormLabel>Location</FormLabel>
                   <div className="flex gap-2">
                     <FormControl>
-                      <Input {...field} placeholder="e.g., Lahore, Punjab" />
+                      <Input {...field} list="location-options" placeholder="e.g., Lahore, Punjab" />
                     </FormControl>
+                     <datalist id="location-options">
+                        {pakistanLocations.map((location) => <option key={location} value={location} />)}
+                    </datalist>
                     <Button type="button" variant="outline" size="icon" onClick={handleLocation} aria-label="Use current location">
                       <MapPin className="h-4 w-4" />
                     </Button>
