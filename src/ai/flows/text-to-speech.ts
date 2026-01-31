@@ -21,13 +21,30 @@ const textToSpeechFlow = ai.defineFlow(
     outputSchema: z.object({media: z.string()}),
   },
   async ({text, lang}) => {
+    // Define specific, high-quality voices for supported languages to ensure reliability.
+    const voiceMap: {[key: string]: string} = {
+      'ur-PK': 'ur-PK-Standard-A', // Urdu (Pakistan)
+      'pa-IN': 'pa-IN-Wavenet-A',  // Punjabi (India)
+      'sd-IN': 'sd-IN-Standard-A', // Sindhi (India)
+    };
+
+    let speechConfig: any = {
+      languageCode: lang,
+    };
+
+    // Use a specific prebuilt voice if one is mapped for the selected language.
+    if (voiceMap[lang]) {
+      speechConfig.voiceConfig = {
+        prebuiltVoiceConfig: {voiceName: voiceMap[lang]},
+      };
+    }
+    // For languages without a mapped voice (like Pashto), we rely on the language code alone.
+
     const {media} = await ai.generate({
       model: googleAI.model('gemini-2.5-flash-preview-tts'),
       config: {
         responseModalities: ['AUDIO'],
-        speechConfig: {
-          languageCode: lang,
-        },
+        speechConfig: speechConfig,
       },
       prompt: text,
     });
