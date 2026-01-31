@@ -198,7 +198,7 @@ export function YieldPredictionForm() {
                   <Sparkles className="h-6 w-6 text-primary" />
                   Prediction & Insights
                 </CardTitle>
-                <SpeakButton textToSpeak={`${result.predictedYield}. ${result.insights}`} />
+                <SpeakButton lang={language} textToSpeak={`${result.predictedYield}. ${result.insights}`} />
               </div>
             </CardHeader>
             <CardContent className="space-y-4">

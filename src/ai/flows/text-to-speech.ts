@@ -10,25 +10,23 @@ import {googleAI} from '@genkit-ai/google-genai';
 import {z} from 'genkit';
 import wav from 'wav';
 
-export async function textToSpeech(text: string): Promise<{media: string}> {
-  return textToSpeechFlow({text});
+export async function textToSpeech(text: string, lang: string = 'ur-PK'): Promise<{media: string}> {
+  return textToSpeechFlow({text, lang});
 }
 
 const textToSpeechFlow = ai.defineFlow(
   {
     name: 'textToSpeechFlow',
-    inputSchema: z.object({text: z.string()}),
+    inputSchema: z.object({text: z.string(), lang: z.string()}),
     outputSchema: z.object({media: z.string()}),
   },
-  async ({text}) => {
+  async ({text, lang}) => {
     const {media} = await ai.generate({
       model: googleAI.model('gemini-2.5-flash-preview-tts'),
       config: {
         responseModalities: ['AUDIO'],
         speechConfig: {
-          voiceConfig: {
-            prebuiltVoiceConfig: {voiceName: 'Algenib'},
-          },
+          languageCode: lang,
         },
       },
       prompt: text,

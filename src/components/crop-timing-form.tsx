@@ -196,7 +196,7 @@ export function CropTimingForm() {
                   <Sparkles className="h-6 w-6 text-primary" />
                   AI-Powered Suggestions
                 </CardTitle>
-                <SpeakButton textToSpeak={`${result.plantingTime}. ${result.harvestingTime}. ${result.considerations}`} />
+                <SpeakButton lang={language} textToSpeak={`${result.plantingTime}. ${result.harvestingTime}. ${result.considerations}`} />
               </div>
             </CardHeader>
             <CardContent className="space-y-4">

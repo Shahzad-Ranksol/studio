@@ -46,14 +46,14 @@ export async function getYieldPredictionAction(values: YieldPredictionFormValues
   }
 }
 
-export async function textToSpeechAction(text: string) {
+export async function textToSpeechAction(text: string, lang?: string) {
   if (!text) {
     return {
       error: 'No text provided.',
     };
   }
   try {
-    const result = await textToSpeech(text);
+    const result = await textToSpeech(text, lang);
     return { success: result };
   } catch (error) {
     console.error(error);
