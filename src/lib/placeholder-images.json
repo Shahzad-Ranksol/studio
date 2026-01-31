@@ -1,3 +1,28 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-1",
+      "description": "A lush green field of wheat under a clear blue sky, representing agriculture and growth.",
+      "imageUrl": "https://images.unsplash.com/photo-1437252611977-07f74518abd7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHx3aGVhdCUyMGZpZWxkfGVufDB8fHx8MTc2OTgwOTkyMXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "wheat field"
+    },
+    {
+      "id": "crop-timing-banner",
+      "description": "A farmer examining young sprouts in a field, symbolizing crop timing.",
+      "imageUrl": "https://images.unsplash.com/photo-1606711375393-ae22a9ce20a6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxmYXJtZXIlMjBzcHJvdXRzfGVufDB8fHx8MTc2OTgxOTE4MHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "farmer sprouts"
+    },
+    {
+      "id": "yield-prediction-banner",
+      "description": "A combine harvester working in a golden field, representing yield and harvest.",
+      "imageUrl": "https://images.unsplash.com/photo-1600747476236-76579658b1b1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxjb21iaW5lJTIwaGFydmVzdGVyfGVufDB8fHx8MTc2OTc2MzM0NXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "combine harvester"
+    },
+    {
+      "id": "weather-banner",
+      "description": "Dramatic sky with both sun and clouds, representing weather forecasts.",
+      "imageUrl": "https://images.unsplash.com/photo-1562494400-5b335a653209?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8c2t5JTIwY2xvdWRzfGVufDB8fHx8MTc2OTgxOTE4MHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "sky clouds"
+    }
+  ]
 }
